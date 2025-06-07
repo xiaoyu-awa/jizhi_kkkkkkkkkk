@@ -52,6 +52,12 @@ const Legal = ({ waveColor, selected }) => {
         <CustomLink url={JIZHI_LINKS.issues.link} name={JIZHI_LINKS.issues.name} />
       </Paragraph>
       <Paragraph size={400} marginTop="default">
+        快捷链接栏修改:
+        <CustomLink url={JIZHI_LINKS.xiaoyu.link} name={JIZHI_LINKS.xiaoyu.name} />
+        with
+        <CustomLink url={JIZHI_LINKS.CodeGeeX.link} name={JIZHI_LINKS.CodeGeeX.name} />
+      </Paragraph>
+      <Paragraph size={400} marginTop="default">
         <HeartPulse color="#e25555" size={14} marginRight={5} />
         感谢您的支持和喜爱
       </Paragraph>

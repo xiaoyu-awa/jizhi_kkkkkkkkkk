@@ -10,9 +10,39 @@ import {
   Spinner,
   Text,
   InlineAlert,
+  TextInput,
+  IconButton,
+  Card,
 } from 'evergreen-ui';
 import styled from 'styled-components';
 import { WAVES } from '../../constants/appConstants';
+
+const ScrollableMenuWrapper = styled.div`
+  height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  padding-bottom: 24px;
+  position: relative;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+`;
 import Legal from './Legal';
 import FontStatement from './FontStatement';
 import SaveBgMenuItem from './SaveBgMenuItem';
@@ -25,6 +55,33 @@ const SwitchWrapper = styled.div`
 const SegmentedControlWrapper = styled.div`
   margin-left: 16px;
 `;
+
+const QuickLinksForm = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+`;
+
+const QuickLinkItem = styled.div`
+  display: flex;
+  gap: 8px;
+  width: 100%;
+`;
+
+const StyledTextInput = styled(TextInput)`
+  width: 120px;
+`;
+
+const titleStyle = {
+  margin: 0,
+  marginBottom: 8,
+  fontSize: 12,
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.6px',
+};
 
 const MenuContent = (props) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -50,6 +107,10 @@ const MenuContent = (props) => {
     onFontTypeChange,
     isFontLoading,
     waveColor,
+    showQuickLinks,
+    onQuickLinksVisibilityChange,
+    quickLinks,
+    onQuickLinksUpdate,
   } = props;
 
   const bgOptions = [
@@ -116,13 +177,18 @@ const MenuContent = (props) => {
       checkedState: colorStayChecked,
       onChangeFunc: onColorStayChange,
     },
+    {
+      name: '快捷链接栏',
+      checkedState: showQuickLinks,
+      onChangeFunc: onQuickLinksVisibilityChange,
+    },
   ];
 
   const tabs = [
     {
       tabName: '设置',
       tabContent: (
-        <>
+        <ScrollableMenuWrapper>
           <Menu.Group title="偏好">
             {switchOptions.map((option) => {
               if (selected !== WAVES && option.name === '保留颜色名称') return;
@@ -148,7 +214,60 @@ const MenuContent = (props) => {
               />
             </SegmentedControlWrapper>
           </Menu.Group>
-        </>
+          <Menu.Divider />
+          <Menu.Group>
+            <Card elevation={0} padding={15} style={{ width: '100%' }}>
+              <div
+                className="menu-item"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <p style={titleStyle}>快捷链接栏</p>
+              </div>
+              {showQuickLinks && (
+                <QuickLinksForm>
+                  {quickLinks.map((link, index) => (
+                    <QuickLinkItem key={index}>
+                      <StyledTextInput
+                        value={link.name}
+                        placeholder="名称"
+                        onChange={(e) => {
+                          const newLinks = [...quickLinks];
+                          newLinks[index] = { ...link, name: e.target.value };
+                          onQuickLinksUpdate(newLinks);
+                        }}
+                      />
+                      <StyledTextInput
+                        value={link.url}
+                        placeholder="URL"
+                        onChange={(e) => {
+                          const newLinks = [...quickLinks];
+                          newLinks[index] = { ...link, url: e.target.value };
+                          onQuickLinksUpdate(newLinks);
+                        }}
+                      />
+                      <IconButton
+                        icon="trash"
+                        intent="danger"
+                        onClick={() => {
+                          const newLinks = quickLinks.filter((_, i) => i !== index);
+                          onQuickLinksUpdate(newLinks);
+                        }}
+                      />
+                    </QuickLinkItem>
+                  ))}
+                  <IconButton
+                    icon="plus"
+                    appearance="minimal"
+                    onClick={() => {
+                      const newLinks = [...quickLinks, { name: '', url: '' }];
+                      onQuickLinksUpdate(newLinks);
+                    }}
+                  />
+                </QuickLinksForm>
+              )}
+            </Card>
+          </Menu.Group>
+        </ScrollableMenuWrapper>
       ),
     },
     {
@@ -277,6 +396,15 @@ MenuContent.propTypes = {
   onFontTypeChange: PropTypes.func,
   isFontLoading: PropTypes.bool,
   waveColor: PropTypes.object,
+  showQuickLinks: PropTypes.bool,
+  onQuickLinksVisibilityChange: PropTypes.func,
+  quickLinks: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      url: PropTypes.string,
+    })
+  ),
+  onQuickLinksUpdate: PropTypes.func,
 };
 
 export default MenuContent;

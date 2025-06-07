@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Popover, Position, Icon } from 'evergreen-ui';
 import styled, { css } from 'styled-components';
+import PropTypes from 'prop-types';
 import MenuContent from './MenuContent';
-
 const MenuWrapper = styled.div`
   position: absolute;
   left: 30px;
   bottom: 20px;
+  z-index: 1000;
 `;
 
 const MenuButton = styled(Icon)`
@@ -27,7 +28,13 @@ const MenuButton = styled(Icon)`
     `}
 `;
 
-const ConfigMenu = (props) => {
+const ConfigMenu = ({
+  showQuickLinks,
+  onQuickLinksVisibilityChange,
+  quickLinks,
+  onQuickLinksUpdate,
+  ...props
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOnOpen = () => {
@@ -44,12 +51,32 @@ const ConfigMenu = (props) => {
         position={Position.BOTTOM_LEFT}
         onOpen={handleOnOpen}
         onClose={handleOnClose}
-        content={<MenuContent {...props} />}
+        content={
+          <MenuContent
+            {...props}
+            showQuickLinks={showQuickLinks}
+            onQuickLinksVisibilityChange={onQuickLinksVisibilityChange}
+            quickLinks={quickLinks}
+            onQuickLinksUpdate={onQuickLinksUpdate}
+          />
+        }
       >
         <MenuButton id="menu-button" icon="cog" size={20} color="white" isOpen={isOpen} />
       </Popover>
     </MenuWrapper>
   );
+};
+
+ConfigMenu.propTypes = {
+  showQuickLinks: PropTypes.bool,
+  onQuickLinksVisibilityChange: PropTypes.func,
+  quickLinks: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      url: PropTypes.string,
+    })
+  ),
+  onQuickLinksUpdate: PropTypes.func,
 };
 
 export default ConfigMenu;

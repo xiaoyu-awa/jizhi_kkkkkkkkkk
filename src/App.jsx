@@ -8,10 +8,12 @@ import Verses from './components/Verses';
 import ConfigMenu from './components/ConfigMenu';
 import SearchInput from './components/SearchInput';
 import ColorName from './components/ColorName';
+import QuickLinks from './components/QuickLinks';
 import { saveBackground, insertFont, fetchAndSetFont, pickColor, isDarkModeEnabled } from './utils';
 import Storager from './utils/storager';
 import { load } from './utils/jinrishici';
 import {
+  DEFAULT_QUICK_LINKS,
   HORIZONTAL,
   VERTICAL,
   WAVES,
@@ -42,6 +44,8 @@ class App extends Component {
       focused: false,
       fontName: DEFAULT_FONT,
       waveColor: pickColor(false),
+      quickLinks: DEFAULT_QUICK_LINKS,
+      showQuickLinks: true,
     };
   }
 
@@ -73,6 +77,8 @@ class App extends Component {
         'fontName',
         'fonts',
         'colorMode',
+        'quickLinks',
+        'showQuickLinks',
       ],
       (res) => {
         if (res.fonts && res.fontName === res.fonts.fontName) {
@@ -92,6 +98,8 @@ class App extends Component {
           fontName: res.fontName || DEFAULT_FONT,
           isDarkMode: res.colorMode === 'os' ? isDarkModeEnabled() : res.colorMode === 'dark',
           waveColor: pickColor(!!this.state.isDarkMode),
+          quickLinks: res.quickLinks || DEFAULT_QUICK_LINKS,
+          showQuickLinks: res.showQuickLinks !== false,
         });
       }
     );
@@ -206,6 +214,23 @@ class App extends Component {
 
   handleBlur = () => this.setState({ focused: false });
 
+  handleQuickLinksVisibilityChange = () => {
+    this.setState(
+      (state) => ({
+        showQuickLinks: !state.showQuickLinks,
+      }),
+      () => {
+        Storager.set({ showQuickLinks: this.state.showQuickLinks });
+      }
+    );
+  };
+
+  handleQuickLinksUpdate = (quickLinks) => {
+    this.setState({ quickLinks }, () => {
+      Storager.set({ quickLinks });
+    });
+  };
+
   render() {
     const {
       verses,
@@ -224,6 +249,8 @@ class App extends Component {
       waveColor,
       isFontLoading,
       colorMode,
+      quickLinks,
+      showQuickLinks,
     } = this.state;
     const sketches = { blobs, waves };
 
@@ -277,6 +304,10 @@ class App extends Component {
           onFontTypeChange={this.handleFontTypeChange}
           isFontLoading={isFontLoading}
           waveColor={waveColor}
+          showQuickLinks={showQuickLinks}
+          onQuickLinksVisibilityChange={this.handleQuickLinksVisibilityChange}
+          quickLinks={quickLinks}
+          onQuickLinksUpdate={this.handleQuickLinksUpdate}
         >
           {errMessage && (
             <div style={{ height: 30 }}>
@@ -286,6 +317,7 @@ class App extends Component {
             </div>
           )}
         </ConfigMenu>
+        {showQuickLinks && <QuickLinks links={quickLinks} isDarkMode={isDarkMode} />}
         {showSearchBarChecked && (
           <SearchInput
             value={value}

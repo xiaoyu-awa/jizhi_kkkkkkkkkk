@@ -46,4 +46,19 @@ export const JIZHI_LINKS = {
     name: '提交反馈',
     link: 'https://github.com/unicar9/jizhi/issues',
   },
+  xiaoyu: {
+    name: '筱雨的github',
+    link: 'https://github.com/xiaoyu-awa/jizhi_kkkkkkkkkk',
+  },
+  CodeGeeX: {
+    name: 'CodeGeex',
+    link: 'https://codegeex.cn/',
+  },
 };
+
+// 默认快捷链接
+export const DEFAULT_QUICK_LINKS = [
+  { name: 'Google', url: 'https://www.google.com' },
+  { name: 'GitHub', url: 'https://github.com' },
+  { name: 'Gmail', url: 'https://mail.google.com' },
+];
